@@ -1,6 +1,3 @@
-<!-- Graphics Example Code.  
-    index.html - The web page document containing the canvas (drawing surface).  It launches your JavaScript files.
--->
 <!DOCTYPE html>
 <html lang="En">
 <head>
@@ -9,19 +6,16 @@
     <title>Tiny Graphics</title>
 </head>
 <body style="background: White">
-<!-- Begin typing your web page here. -->
-<!-- The following code embeds a WebGL canvas panel, loads certain scene(s), and displays panel(s) of their controls.-->
-<div class="canvas-widget" id="main-canvas"></div>
-<script type=module>
-    // ********************* THE ENTRY POINT OF YOUR WHOLE PROGRAM STARTS HERE *********************
-    // Indicate which element on the page you want the Canvas_Widget to replace with a 3D WebGL area:
-    const element_to_replace = document.querySelector("#main-canvas");
-    import {Main_Scene, Additional_Scenes, Canvas_Widget} from './main-scene.js';
-    // Import the file that defines a scene.
-    const scenes = [Main_Scene, ...Additional_Scenes].map(scene => new scene());
-    // This line creates your scene.
-    new Canvas_Widget(element_to_replace, scenes);
-</script>
-
+  <!-- Add tabindex="1" so that this div can receive focus and key events. -->
+  <div class="canvas-widget" id="main-canvas" tabindex="1"></div>
+  <script type=module>
+      // Entry point for your program.
+      const element_to_replace = document.querySelector("#main-canvas");
+      // Optional: when the canvas is clicked, focus it.
+      element_to_replace.addEventListener("click", () => element_to_replace.focus());
+      import {Main_Scene, Additional_Scenes, Canvas_Widget} from './main-scene.js';
+      const scenes = [Main_Scene, ...Additional_Scenes].map(scene => new scene());
+      new Canvas_Widget(element_to_replace, scenes);
+  </script>
 </body>
 </html>
