@@ -9,7 +9,7 @@ export function initEnvironment(scene, renderer) {
   ground.receiveShadow = true;
 
   roof.rotation.x = Math.PI / 2;
-  roof.position.y = 100;
+  roof.position.y = 150;
   
   scene.add(roof);
   scene.add(ground);

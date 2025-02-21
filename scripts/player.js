@@ -4,7 +4,7 @@ export function createPlayer(scene) {
   const geometry = new THREE.SphereGeometry(3, 32, 16); 
   const material = new THREE.MeshPhongMaterial({ color: 0x90EE90 }); 
   const mesh = new THREE.Mesh(geometry, material); 
-  mesh.position.y = 60;
+  mesh.position.y = 75;
   mesh.castShadow = true;
   scene.add(mesh);
 
@@ -18,7 +18,7 @@ export function createPlayer(scene) {
   };
 }
 
-export function updatePlayer(player, keysPressed) {
+export function updatePlayer(player, keysPressed, endGame) {
   if (keysPressed['a'] && player.mesh.position.x > -100) {
     player.mesh.position.x -= player.moveSpeed;
   }
@@ -31,6 +31,12 @@ export function updatePlayer(player, keysPressed) {
 
   if (player.mesh.position.y - 3 <= 0) {
     player.mesh.position.y = 3;
+    player.velocityY = 0;
+    endGame();
+  }
+
+  if (player.mesh.position.y + 3 >= 150) {
+    player.mesh.position.y = 147;
     player.velocityY = 0;
   }
 

@@ -2,8 +2,11 @@ import * as THREE from 'three';
 import { initEnvironment } from './scripts/environment.js';
 import { createPlayer, updatePlayer } from './scripts/player.js';
 import { setupInput } from './scripts/input.js';
+import { createObstacle, updateObstacles } from './scripts/obstacle.js';
+
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+let gameState = { active: false }; // need object to pass by reference
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -14,18 +17,57 @@ scene.background = new THREE.Color(0x87ceeb);
 
 initEnvironment(scene, renderer);
 const player = createPlayer(scene);
-const keysPressed = setupInput(player);
+const keysPressed = setupInput(player, gameState, () => { // gameStart function
+    gameState.active = true;
+    generateStarterObstacles();
+    player.velocityY = 0.9; 
+    console.log("Game started!");
+});
+
+let obstacles = [];
+
+function endGame(){
+    gameState.active = false;
+    player.mesh.position.set(0, 75, 0);
+    obstacles.forEach(obstacle => scene.remove(obstacle));
+    obstacles = [];
+    console.log("Game ended!");
+}
+
+function generateStarterObstacles() {
+    for (let i = 0; i < 10; i++) { // number of starter obstacles
+        let xPos = Math.floor(Math.random() * 200) - 100;
+        let yPos = Math.random() < 0.5 ? 30 : 120;
+        let zPos = player.mesh.position.z - (150 + i * 100); // spaced apart
+        let obstacle = createObstacle(25, 60, 50, xPos, yPos, zPos);
+        obstacles.push(obstacle);
+        scene.add(obstacle);
+    }
+}
+
+
+let lastObstacleTime = 0;
 
 function render(time){
-  time *= 0.001;
-
-  updatePlayer(player, keysPressed);
-
-  camera.position.set(player.mesh.position.x, player.mesh.position.y + 5, player.mesh.position.z + 60);
-  camera.lookAt(player.mesh.position);
+    time *= 0.001;
+    if (gameState.active){
+        if (time - lastObstacleTime >= 1.5){
+            lastObstacleTime = time;
+            for (let i = 0; i < 4; i++){
+                let obstacle = createObstacle(25, 60, 50, Math.floor(Math.random() * 200) - 100, Math.random() < 0.5 ? 30 : 120, player.mesh.position.z - 950);
+                obstacles.push(obstacle)
+                scene.add(obstacle);
+            }
+        }
+        updateObstacles(obstacles, player, scene);
+        updatePlayer(player, keysPressed, endGame);
+    }
   
-  renderer.render(scene, camera);
-  requestAnimationFrame(render);
+    camera.position.set(player.mesh.position.x, player.mesh.position.y, player.mesh.position.z + 50);
+    camera.lookAt(player.mesh.position);
+    
+    renderer.render(scene, camera);
+    requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
 
