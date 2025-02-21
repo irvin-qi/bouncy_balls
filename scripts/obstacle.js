@@ -9,12 +9,18 @@ export function createObstacle(width, height, depth, x, y, z) {
     return obstacle;
 }
 
-export function updateObstacles(obstacles, player, scene){
+export function updateObstacles(obstacles, player, scene, endGame){
     const obstacleSpeed = 0.8;
+    const playerBox = new THREE.Box3().setFromObject(player.mesh);
 
     for (let i = 0; i < obstacles.length; i++){
         let obstacle = obstacles[i];
         obstacle.position.z += obstacleSpeed;
+        const obstacleBox = new THREE.Box3().setFromObject(obstacle);
+        if (playerBox.intersectsBox(obstacleBox)){
+            endGame(); 
+            return;
+        }
         if (obstacle.position.z > player.mesh.position.z + 20){
             scene.remove(obstacle);
             obstacles.splice(i, 1); // cant use delete since leaves undefined

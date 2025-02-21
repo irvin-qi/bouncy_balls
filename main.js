@@ -59,7 +59,7 @@ function render(time){
                 scene.add(obstacle);
             }
         }
-        updateObstacles(obstacles, player, scene);
+        updateObstacles(obstacles, player, scene, endGame);
         updatePlayer(player, keysPressed, endGame);
     }
   
