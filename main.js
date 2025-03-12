@@ -3,6 +3,7 @@ import { initEnvironment } from "./scripts/environment.js";
 import { createPlayer, updatePlayer } from "./scripts/player.js";
 import { setupInput } from "./scripts/input.js";
 import { createObstacle, updateObstacles } from "./scripts/obstacle.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 let gameState = { active: false }; // need object to pass by reference
@@ -15,8 +16,12 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
+camera.position.set(0, 75, 75); // Adjust this as needed
+camera.lookAt(0, 0, 0);
 
 const scene = new THREE.Scene();
+
+const controls = new OrbitControls(camera, renderer.domElement);
 
 initEnvironment(scene, renderer);
 const player = createPlayer(scene);
@@ -25,6 +30,12 @@ const keysPressed = setupInput(player, gameState, () => {
   gameState.active = true;
   generateStarterObstacles();
   player.velocityY = 0.9;
+  camera.position.set(
+    player.mesh.position.x,
+    player.mesh.position.y,
+    player.mesh.position.z + 75
+  );
+  camera.lookAt(player.mesh.position);
   console.log("Game started!");
 });
 
@@ -74,12 +85,12 @@ function render(time) {
     updatePlayer(player, keysPressed, endGame);
   }
 
-  camera.position.set(
+  controls.target.set(
     player.mesh.position.x,
     player.mesh.position.y,
-    player.mesh.position.z + 50
+    player.mesh.position.z
   );
-  camera.lookAt(player.mesh.position);
+  controls.update();
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);

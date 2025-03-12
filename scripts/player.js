@@ -5,7 +5,9 @@ export function createPlayer(scene) {
   const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
 
   const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.x = 0;
   mesh.position.y = 75;
+  mesh.position.z = 0;
   mesh.castShadow = true;
   scene.add(mesh);
 
