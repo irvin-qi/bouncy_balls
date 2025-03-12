@@ -20,7 +20,7 @@ export function initEnvironment(scene, renderer) {
   scene.add(ambientLight);
 
   const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
-  sunLight.position.set(0, 100, -100);
+  sunLight.position.set(0, 100, 100);
   sunLight.castShadow = true;
   sunLight.shadow.mapSize.width = 4096;
   sunLight.shadow.mapSize.height = 4096;
