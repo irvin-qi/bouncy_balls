@@ -1,9 +1,10 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 export function createPlayer(scene) {
-  const geometry = new THREE.SphereGeometry(3, 32, 16); 
-  const material = new THREE.MeshPhongMaterial({ color: 0x90EE90 }); 
-  const mesh = new THREE.Mesh(geometry, material); 
+  const geometry = new THREE.SphereGeometry(3, 32, 16);
+  const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+
+  const mesh = new THREE.Mesh(geometry, material);
   mesh.position.y = 75;
   mesh.castShadow = true;
   scene.add(mesh);
@@ -14,15 +15,15 @@ export function createPlayer(scene) {
     canJump: true,
     jumpCooldown: 80,
     moveSpeed: 0.5,
-    gravity: -0.98
+    gravity: -0.98,
   };
 }
 
 export function updatePlayer(player, keysPressed, endGame) {
-  if (keysPressed['a'] && player.mesh.position.x > -100) {
+  if (keysPressed["a"] && player.mesh.position.x > -100) {
     player.mesh.position.x -= player.moveSpeed;
   }
-  if (keysPressed['d'] && player.mesh.position.x < 100) {
+  if (keysPressed["d"] && player.mesh.position.x < 100) {
     player.mesh.position.x += player.moveSpeed;
   }
 

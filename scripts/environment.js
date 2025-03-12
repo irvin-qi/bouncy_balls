@@ -1,7 +1,9 @@
-import * as THREE from 'three';
+import * as THREE from "three";
+import skyTexture from "/assets/sky.png";
 
 export function initEnvironment(scene, renderer) {
   const geometry = new THREE.PlaneGeometry(200, 5000);
+  const texture = new THREE.TextureLoader().load(skyTexture);
   const material = new THREE.MeshPhongMaterial({ color: 0x808080 });
   const ground = new THREE.Mesh(geometry, material);
   const roof = new THREE.Mesh(geometry, material);
@@ -10,7 +12,7 @@ export function initEnvironment(scene, renderer) {
 
   roof.rotation.x = Math.PI / 2;
   roof.position.y = 150;
-  
+
   scene.add(roof);
   scene.add(ground);
 
@@ -33,4 +35,6 @@ export function initEnvironment(scene, renderer) {
 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  scene.background = texture;
 }
