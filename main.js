@@ -55,7 +55,7 @@ function endGame() {
   cancelAnimationFrame(gameLoopId); // Stop rendering
 
   // Display "GAME OVER" and pause for 5 seconds
-  displayText("GAME OVER - press space to play again", scene);
+  displayText("GAME OVER", "PRESS SPACE TO RESTART", scene);
 
   console.log("Resuming game...");
   requestAnimationFrame(render);

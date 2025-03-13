@@ -32,6 +32,14 @@ export function createObstacle(width, height, depth, x, y, z) {
     Math.PI * 2
   );
 
+  const diskGeom = new THREE.CylinderGeometry(
+    topRad,
+    topRad,
+    1,
+    segments,
+    false
+  );
+
   const bottomTexture = new THREE.TextureLoader().load(bottomTube);
   const topTexture = new THREE.TextureLoader().load(topTube);
 
@@ -45,18 +53,21 @@ export function createObstacle(width, height, depth, x, y, z) {
     transparent: true,
   });
 
+  const diskMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
   const bottomObj = new THREE.Mesh(bottomGeom, bottomMat);
   const topObj = new THREE.Mesh(topGeom, topMat);
+  const disk = new THREE.Mesh(diskGeom, diskMat);
 
-  if (y > upperPos) {
-    topObj.position.set(0, -bottomHeight / 2, 0); // Position beneath
-  } else {
-    topObj.position.set(0, bottomHeight / 2, 0); // Position on top
-  }
+  topObj.position.set(0, bottomHeight / 2, 0);
+  disk.position.set(0, (bottomHeight + topHeight) / 2, 0);
 
   const obstacleGroup = new THREE.Group();
   obstacleGroup.add(bottomObj);
   obstacleGroup.add(topObj);
+  obstacleGroup.add(disk);
+  // Rotate the obstacle group based on the y position (for example, rotating by 90 degrees)
+  obstacleGroup.rotation.z = y > upperPos ? Math.PI : 0;
 
   obstacleGroup.position.set(x, y, z);
 
