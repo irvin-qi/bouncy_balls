@@ -53,7 +53,7 @@ function generateStarterObstacles() {
   for (let i = 0; i < 10; i++) {
     // number of starter obstacles
     let xPos = Math.floor(Math.random() * 200) - 100;
-    let yPos = Math.random() < 0.5 ? 30 : 120;
+    let yPos = Math.random() < 0.5 ? 30 : 140;
     let zPos = player.mesh.position.z - (150 + i * 100); // spaced apart
     let obstacle = createObstacle(25, 60, 50, xPos, yPos, zPos);
     obstacles.push(obstacle);
