@@ -5,11 +5,12 @@ import { setupInput } from "./scripts/input.js";
 import { createObstacle, updateObstacles } from "./scripts/obstacle.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { displayText, removeText } from "./scripts/text.js";
-import { remove } from "three/examples/jsm/libs/tween.module.js";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 let gameState = { active: false };
 let gameLoopId; // Store the animation frame ID
+const lowerObstacleYPos = 20;
+const upperObstacleYPos = 130;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -62,10 +63,15 @@ function endGame() {
 
 function generateStarterObstacles() {
   for (let i = 0; i < 10; i++) {
+    const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+
     let xPos = Math.floor(Math.random() * 200) - 100;
-    let yPos = Math.random() < 0.5 ? 30 : 120;
+    let yPos =
+      Math.random() < 0.5
+        ? lowerObstacleYPos + (obstacleHeight - 45) / 2
+        : upperObstacleYPos - (obstacleHeight - 45) / 2;
     let zPos = player.mesh.position.z - (150 + i * 100);
-    let obstacle = createObstacle(25, 60, 50, xPos, yPos, zPos);
+    let obstacle = createObstacle(25, obstacleHeight, 50, xPos, yPos, zPos);
     obstacles.push(obstacle);
     scene.add(obstacle);
   }
@@ -80,13 +86,18 @@ function render(time) {
   if (gameState.active) {
     if (time - lastObstacleTime >= 1.5) {
       lastObstacleTime = time;
+
       for (let i = 0; i < 4; i++) {
+        const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+
         let obstacle = createObstacle(
           25,
-          60,
+          obstacleHeight,
           50,
           Math.floor(Math.random() * 200) - 100,
-          Math.random() < 0.5 ? 30 : 120,
+          Math.random() < 0.5
+            ? lowerObstacleYPos + (obstacleHeight - 45) / 2
+            : upperObstacleYPos - (obstacleHeight - 45) / 2,
           player.mesh.position.z - 950
         );
         obstacles.push(obstacle);
