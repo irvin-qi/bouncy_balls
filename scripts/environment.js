@@ -1,3 +1,4 @@
+// environment.js
 import * as THREE from "three";
 import sky from "/assets/sky.avif";
 import grass from "/assets/grass.png";
@@ -32,18 +33,22 @@ export function initEnvironment(scene, renderer) {
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
   scene.add(ambientLight);
 
+  // Updated sunlight: front right side, with an expanded shadow camera.
   const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
-  sunLight.position.set(0, 100, 100);
+  sunLight.position.set(100, 100, 50);
   sunLight.castShadow = true;
   sunLight.shadow.mapSize.width = 4096;
   sunLight.shadow.mapSize.height = 4096;
   sunLight.shadow.camera.near = 0.5;
   sunLight.shadow.camera.far = 500;
-  const d = 100;
+  
+  // Increase the camera frustum to cover a larger area.
+  const d = 1000; // Expanded from 100 to 200
   sunLight.shadow.camera.left = -d;
   sunLight.shadow.camera.right = d;
   sunLight.shadow.camera.top = d;
   sunLight.shadow.camera.bottom = -d;
+  
   scene.add(sunLight);
 
   renderer.shadowMap.enabled = true;
@@ -51,5 +56,6 @@ export function initEnvironment(scene, renderer) {
 
   scene.background = skyTexture;
 
-  return { ground, roof };
+  // Return sunLight along with ground and roof so we can update shader uniforms later.
+  return { ground, roof, sunLight };
 }

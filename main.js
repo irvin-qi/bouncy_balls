@@ -1,3 +1,4 @@
+// main.js
 import * as THREE from "three";
 import { initEnvironment } from "./scripts/environment.js";
 import { createPlayer, updatePlayer } from "./scripts/player.js";
@@ -49,6 +50,7 @@ function updateScore(newScore) {
 }
 
 let bounds = initEnvironment(scene, renderer);
+const { ground, roof, sunLight } = bounds;
 const player = createPlayer(scene);
 generateStarterObstacles();
 const keysPressed = setupInput(player, gameState, () => {
@@ -69,8 +71,7 @@ const keysPressed = setupInput(player, gameState, () => {
 });
 
 function endGame() {
-  gameState.active = false; // Stop game logic
-
+  gameState.active = false;
   player.mesh.position.set(0, 75, 0);
   if (player.isShielded) {
     scene.remove(player.shieldMesh);
@@ -87,12 +88,9 @@ function endGame() {
   coins.forEach((coin) => scene.remove(coin));
   coins = [];
   console.log("Game ended!");
-  cancelAnimationFrame(gameLoopId); // Stop rendering
-
-  // Display "GAME OVER" and pause for 5 seconds
+  cancelAnimationFrame(gameLoopId);
   displayText("GAME OVER", "PRESS SPACE TO RESTART", scene);
   generateStarterObstacles();
-
   console.log("Resuming game...");
   requestAnimationFrame(render);
 }
@@ -102,13 +100,11 @@ function generateStarterObstacles() {
     const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
     const laneIndex = Math.floor(Math.random() * lanes.length);
     const xPos = lanes[laneIndex];
-
     const yPos =
       Math.random() < 0.5
         ? lowerObstacleYPos + (obstacleHeight - 45) / 2
         : upperObstacleYPos - (obstacleHeight - 45) / 2;
     const zPos = -(150 + i * 100);
-
     let obstacle = createObstacle(25, obstacleHeight, 50, xPos, yPos, zPos);
     obstacles.push(obstacle);
     scene.add(obstacle);
@@ -120,8 +116,29 @@ let lastPowerupTime = 0;
 let lastCoinTime = 0;
 let startTime = 0;
 const smoothTarget = new THREE.Vector3().copy(player.mesh.position);
+
+// Function to traverse the scene and update uniforms for every custom shader material.
+function updateCustomShaderUniforms() {
+  scene.traverse(function(object) {
+    if (object.material && object.material instanceof THREE.ShaderMaterial) {
+      object.material.uniforms.uViewPosition.value.copy(camera.position);
+      object.material.uniforms.uLightPosition.value.copy(sunLight.position);
+      let lightMatrix = new THREE.Matrix4();
+      lightMatrix.multiplyMatrices(
+        sunLight.shadow.camera.projectionMatrix,
+        sunLight.shadow.camera.matrixWorldInverse
+      );
+      object.material.uniforms.lightMatrix.value.copy(lightMatrix);
+      // Check if the shadow map is available before updating the uniform.
+      if (sunLight.shadow.map && sunLight.shadow.map.texture) {
+        object.material.uniforms.uShadowMap.value = sunLight.shadow.map.texture;
+      }
+    }
+  });
+}
+
 function render(time) {
-  gameLoopId = requestAnimationFrame(render); // Store loop ID
+  gameLoopId = requestAnimationFrame(render);
   time *= 0.001;
   if (gameState.active) {
     const elapsed = time - startTime;
@@ -133,15 +150,11 @@ function render(time) {
     }
     if (time - lastObstacleTime >= 1) {
       lastObstacleTime = time;
-
       const obstacleCount = Math.floor(Math.random() * 5) + 2;
-
       let availableLanes = lanes.slice();
-
       for (let i = 0; i < obstacleCount; i++) {
         const laneIndex = Math.floor(Math.random() * availableLanes.length);
         const laneX = availableLanes.splice(laneIndex, 1)[0];
-
         const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
         let obstacleY;
         if (Math.random() < 0.5) {
@@ -150,7 +163,6 @@ function render(time) {
           obstacleY = upperObstacleYPos - (obstacleHeight - 45) / 2;
         }
         const obstacleZ = player.mesh.position.z - 950;
-
         let obstacle = createObstacle(
           25,
           obstacleHeight,
@@ -163,7 +175,6 @@ function render(time) {
         scene.add(obstacle);
       }
     }
-
     if (time - lastPowerupTime >= 5) {
       lastPowerupTime = time;
       for (let i = 0; i < 4; i++) {
@@ -181,7 +192,6 @@ function render(time) {
         scene.add(powerUp.mesh);
       }
     }
-
     if (time - lastCoinTime >= 1) {
       lastCoinTime = time;
       for (let i = 0; i < 2; i++) {
@@ -208,8 +218,8 @@ function render(time) {
       player.obstacleSpeed
     );
     updatePlayer(player, keysPressed, endGame);
-    bounds.ground.position.z = player.mesh.position.z;
-    bounds.roof.position.z = player.mesh.position.z;
+    ground.position.z = player.mesh.position.z;
+    roof.position.z = player.mesh.position.z;
   }
   smoothTarget.lerp(player.mesh.position, 0.02);
   smoothTarget.x = THREE.MathUtils.clamp(smoothTarget.x, -40, 40);
@@ -217,6 +227,9 @@ function render(time) {
   controls.target.copy(smoothTarget);
   camera.lookAt(smoothTarget);
   controls.update();
+
+  // Update the uniforms for all custom shader materials.
+  updateCustomShaderUniforms();
 
   renderer.render(scene, camera);
 }
