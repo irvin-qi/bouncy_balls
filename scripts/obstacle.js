@@ -54,9 +54,7 @@ export function createObstacle(width, height, depth, x, y, z) {
     Math.PI * 2
   );
 
-  // Inner geometry: slightly smaller radius so we have thickness.
-  // Also openEnded so it aligns inside the outer geometry.
-  const innerTopRad = 14; // Adjust this gap for more/less thickness
+  const innerTopRad = 14; 
   const topInnerGeom = new THREE.CylinderGeometry(
     innerTopRad,
     innerTopRad,
@@ -68,7 +66,7 @@ export function createObstacle(width, height, depth, x, y, z) {
     Math.PI * 2
   );
 
-  // Load the top texture (as before).
+  // Load the top texture
   const topTexture = new THREE.TextureLoader().load(topTube);
   topTexture.minFilter = THREE.LinearMipmapLinearFilter;
   topTexture.generateMipmaps = true;
@@ -81,13 +79,9 @@ export function createObstacle(width, height, depth, x, y, z) {
     specularColor: new THREE.Color(0xffffff),
     shininess: 30.0,
   });
-  // Render both inside & outside faces so it doesn't appear "half-circle."
+
   topMat.side = THREE.DoubleSide;
 
-  // Inner material for the top tube (same texture or a different one).
-  // We'll make it double-sided as well, but typically you’d set side = BackSide
-  // if you want to see the inside faces only. Here, DoubleSide ensures we never
-  // see “missing” geometry from any angle.
   const topInnerMat = createCustomPhongMaterial({
     texture: topTexture,
     ambientColor: new THREE.Color(0x222222),
@@ -103,9 +97,6 @@ export function createObstacle(width, height, depth, x, y, z) {
   topOuterMesh.castShadow = true;
   topInnerMesh.castShadow = true;
 
-  // Position the top "lip" so it sits above the bottom tube.
-  // By default, the bottom tube's center is at y=0, so shift
-  // the top portion by half the bottom's height.
   topOuterMesh.position.set(0, bottomHeight / 2, 0);
   topInnerMesh.position.set(0, bottomHeight / 2, 0);
 
