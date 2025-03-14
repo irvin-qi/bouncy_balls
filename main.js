@@ -30,8 +30,8 @@ const controls = new OrbitControls(camera, renderer.domElement);
 let obstacles = [];
 
 initEnvironment(scene, renderer);
-generateStarterObstacles();
 const player = createPlayer(scene);
+generateStarterObstacles();
 const keysPressed = setupInput(player, gameState, () => {
   gameState.active = true;
   player.velocityY = 0.9;
