@@ -35,6 +35,15 @@ let obstacles = [];
 let powerUps = [];
 const lanes = [-80, -40, 0, 40, 80];
 
+let score = 0;
+let lastScore = 0;
+const scoreDiv = document.getElementById("score");
+
+function updateScore(newScore) {
+  score = newScore;
+  scoreDiv.innerText = "Score: " + score;
+}
+
 initEnvironment(scene, renderer);
 const player = createPlayer(scene);
 generateStarterObstacles();
@@ -48,6 +57,9 @@ const keysPressed = setupInput(player, gameState, () => {
   );
   camera.lookAt(player.mesh.position);
   console.log("Game started!");
+  score = 0;
+  lastScore = 0;
+  startTime = performance.now() * 0.001; // set start time (in seconds)
   removeText(scene);
 });
 
@@ -94,14 +106,22 @@ function generateStarterObstacles() {
   }
 }
 
+
+
 let lastObstacleTime = 0;
 let lastPowerupTime = 0;
+let startTime = 0;
 const smoothTarget = new THREE.Vector3().copy(player.mesh.position);
 function render(time) {
   gameLoopId = requestAnimationFrame(render); // Store loop ID
   time *= 0.001;
-
   if (gameState.active) {
+    const elapsed = time - startTime;
+    score = Math.floor(elapsed * 10);
+    if (score !== lastScore) {
+      lastScore = score;
+      updateScore(score);
+    }
     if (time - lastObstacleTime >= 0.5) {
       lastObstacleTime = time;
 

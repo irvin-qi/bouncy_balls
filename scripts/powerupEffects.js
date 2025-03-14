@@ -135,7 +135,7 @@ export const powerUpEffects = {
     setTimeout(() => {
       player.isSlowed = false;
       player.obstacleSpeed = player.obstacleSpeed * 2;
-    }, 8000);
+    }, 5000);
   },
   bomb: (player, scene, obstacles) => {
     console.log("bomb effect activated");
