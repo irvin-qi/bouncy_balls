@@ -27,10 +27,11 @@ export const powerUpEffects = {
     shieldFollow();
   },
   projectile: (player, scene, obstacles) => {
+    console.log("projectile effect activated");
     const projectiles = [];
-    const numProjectiles = 15;
-    const initialSpeed = 15;
-    const gravity = -0.2;
+    const numProjectiles = 20;
+    const initialSpeed = 9;
+    const gravity = -0.05;
 
     for (let i = 0; i < numProjectiles; i++) {
       const projectileGeometry = new THREE.SphereGeometry(5, 8, 8);
@@ -41,11 +42,13 @@ export const powerUpEffects = {
 
       projectile.position.copy(player.mesh.position);
 
-      let angleOffset = ((Math.random() - 0.5) * Math.PI) / 8;
-      let velocity = new THREE.Vector3(0, 0.5, -1)
-        .applyAxisAngle(new THREE.Vector3(0, 1, 0), angleOffset)
-        .normalize()
-        .multiplyScalar(initialSpeed);
+      const horizontalOffset = ((Math.random() - 0.5) * Math.PI) / 8;
+      const verticalOffset = ((Math.random() - 0.5) * Math.PI) / 8;
+
+      let baseVelocity = new THREE.Vector3(0, 0, -1);
+      baseVelocity.applyAxisAngle(new THREE.Vector3(1, 0, 0), verticalOffset);
+      baseVelocity.applyAxisAngle(new THREE.Vector3(0, 1, 0), horizontalOffset);
+      const velocity = baseVelocity.normalize().multiplyScalar(initialSpeed);
 
       projectile.userData = { velocity }; // Store velocity for updates
       scene.add(projectile);
@@ -86,16 +89,16 @@ export const powerUpEffects = {
     updateProjectiles();
   },
   shrink: (player) => {
-    if (player.isShrunk) return; 
+    if (player.isShrunk) return;
     player.isShrunk = true;
     const targetScale = new THREE.Vector3(0.2, 0.2, 0.2);
-    const normalScale = new THREE.Vector3(1, 1, 1); 
+    const normalScale = new THREE.Vector3(1, 1, 1);
     const duration = 800;
     let startTime = performance.now();
 
     function lerpScale(currentTime) {
       let elapsedTime = currentTime - startTime;
-      let t = Math.min(elapsedTime / duration, 1); 
+      let t = Math.min(elapsedTime / duration, 1);
 
       player.mesh.scale.lerpVectors(normalScale, targetScale, t);
 
@@ -127,11 +130,20 @@ export const powerUpEffects = {
   slow: (player) => {
     if (player.isSlowed) return;
     player.isSlowed = true;
-    player.obstacleSpeed = player.obstacleSpeed / 2; 
+    player.obstacleSpeed = player.obstacleSpeed / 2;
 
     setTimeout(() => {
       player.isSlowed = false;
       player.obstacleSpeed = player.obstacleSpeed * 2;
-    }, 8000); 
+    }, 8000);
+  },
+  bomb: (player, scene, obstacles) => {
+    console.log("bomb effect activated");
+
+    for (let i = 0; i < obstacles.length; i++) {
+      let obstacle = obstacles[i];
+        scene.remove(obstacle);
+    }
+    obstacles.length = 0; 
   },
 };

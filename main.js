@@ -59,7 +59,6 @@ function endGame() {
     scene.remove(player.shieldMesh);
     player.isShielded = false;
   }
-  console.log(player.isShrunk);
   if (player.isShrunk) {
     player.mesh.scale.set(1, 1, 1);
     player.isShrunk = false;
@@ -106,7 +105,7 @@ function render(time) {
     if (time - lastObstacleTime >= 0.5) {
       lastObstacleTime = time;
 
-      const obstacleCount = Math.floor(Math.random() * 8) + 4;
+      const obstacleCount = Math.floor(Math.random() * 5) + 2;
 
       let availableLanes = lanes.slice();
 
@@ -138,18 +137,20 @@ function render(time) {
 
     if (time - lastPowerupTime >= 5) {
       lastPowerupTime = time;
-      let keys = Object.keys(powerUpEffects);
-      let powerUpType = keys[Math.floor(Math.random() * keys.length)];
-      console.log(powerUpType);
-      const powerUp = createPowerUp(
-        Math.floor(Math.random() * 200) - 100,
-        Math.random() < 0.5 ? lowerObstacleYPos + 10 : upperObstacleYPos - 10,
-        player.mesh.position.z - 950,
-        () => powerUpEffects[powerUpType](player, scene, obstacles)
-      );
-      powerUps.push(powerUp);
-      console.log("Powerup created!");
-      scene.add(powerUp.mesh);
+      for (let i = 0; i < 4; i++) {
+        let keys = Object.keys(powerUpEffects);
+        let powerUpType = keys[Math.floor(Math.random() * keys.length)];
+        console.log(powerUpType);
+        const powerUp = createPowerUp(
+          Math.floor(Math.random() * 200) - 100,
+          Math.random() < 0.5 ? lowerObstacleYPos + 10 : upperObstacleYPos - 10,
+          player.mesh.position.z - 950,
+          () => powerUpEffects[powerUpType](player, scene, obstacles)
+        );
+        powerUps.push(powerUp);
+        console.log("Powerup created!");
+        scene.add(powerUp.mesh);
+      }
     }
     updateObstacles(obstacles, player, scene, endGame, player.obstacleSpeed);
     updatePowerUps(powerUps, player, scene, player.obstacleSpeed);
