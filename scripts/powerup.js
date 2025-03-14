@@ -1,11 +1,11 @@
     import * as THREE from "three";
 
     export function createPowerUp(x, y, z, effect) {
-        const powerUpGeometry = new THREE.BoxGeometry(30, 30, 30);
+        const powerUpGeometry = new THREE.BoxGeometry(15, 15, 15);
         const powerUpMaterial = new THREE.MeshPhongMaterial({
             color: 0xffd700,
             emissive: 0xffd700,
-            emissiveIntensity: 0.5  // Adjust the intensity for the desired glow
+            emissiveIntensity: 0.5 
           });
         const powerUp = new THREE.Mesh(powerUpGeometry, powerUpMaterial);
         powerUp.position.set(x, y, z);

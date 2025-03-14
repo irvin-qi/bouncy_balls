@@ -7,6 +7,7 @@ import { createObstacle, updateObstacles } from "./scripts/obstacle.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { displayText, removeText } from "./scripts/text.js";
 import { powerUpEffects } from "./scripts/powerupEffects.js";
+import { createCoin, updateCoins } from "./scripts/coin.js";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 let gameState = { active: false };
@@ -33,9 +34,12 @@ controls.maxDistance = 150;
 
 let obstacles = [];
 let powerUps = [];
+let coins = [];
+
 const lanes = [-80, -40, 0, 40, 80];
 
 let score = 0;
+let coinScore = 0;
 let lastScore = 0;
 const scoreDiv = document.getElementById("score");
 
@@ -59,6 +63,7 @@ const keysPressed = setupInput(player, gameState, () => {
   console.log("Game started!");
   score = 0;
   lastScore = 0;
+  coinScore = 0;
   startTime = performance.now() * 0.001; // set start time (in seconds)
   removeText(scene);
 });
@@ -77,6 +82,10 @@ function endGame() {
   }
   obstacles.forEach((obstacle) => scene.remove(obstacle));
   obstacles = [];
+  powerUps.forEach((powerUp) => scene.remove(powerUp.mesh));
+  powerUps = [];
+  coins.forEach((coin) => scene.remove(coin));
+  coins = [];
   console.log("Game ended!");
   cancelAnimationFrame(gameLoopId); // Stop rendering
 
@@ -106,10 +115,9 @@ function generateStarterObstacles() {
   }
 }
 
-
-
 let lastObstacleTime = 0;
 let lastPowerupTime = 0;
+let lastCoinTime = 0;
 let startTime = 0;
 const smoothTarget = new THREE.Vector3().copy(player.mesh.position);
 function render(time) {
@@ -117,7 +125,8 @@ function render(time) {
   time *= 0.001;
   if (gameState.active) {
     const elapsed = time - startTime;
-    score = Math.floor(elapsed * 10);
+    let timeScore = Math.floor(elapsed * 10);
+    let score = timeScore + coinScore;
     if (score !== lastScore) {
       lastScore = score;
       updateScore(score);
@@ -163,7 +172,7 @@ function render(time) {
         console.log(powerUpType);
         const powerUp = createPowerUp(
           Math.floor(Math.random() * 200) - 100,
-          Math.random() < 0.5 ? lowerObstacleYPos + 10 : upperObstacleYPos - 10,
+          Math.floor(Math.random() * 150) + 10,
           player.mesh.position.z - 950,
           () => powerUpEffects[powerUpType](player, scene, obstacles)
         );
@@ -172,14 +181,39 @@ function render(time) {
         scene.add(powerUp.mesh);
       }
     }
+
+    if (time - lastCoinTime >= 1) {
+      lastCoinTime = time;
+      for (let i = 0; i < 2; i++) {
+        const coin = createCoin(
+          Math.floor(Math.random() * 200) - 100,
+          Math.floor(Math.random() * 150) + 10,
+          player.mesh.position.z - 950
+        );
+        coins.push(coin);
+        console.log("coin created!");
+        scene.add(coin);
+      }
+    }
     updateObstacles(obstacles, player, scene, endGame, player.obstacleSpeed);
     updatePowerUps(powerUps, player, scene, player.obstacleSpeed);
+    updateCoins(
+      coins,
+      player,
+      scene,
+      () => {
+        coinScore += 100;
+        console.log("coin collected!");
+      },
+      player.obstacleSpeed
+    );
     updatePlayer(player, keysPressed, endGame);
   }
   smoothTarget.lerp(player.mesh.position, 0.02);
   smoothTarget.x = THREE.MathUtils.clamp(smoothTarget.x, -40, 40);
   smoothTarget.y = THREE.MathUtils.clamp(smoothTarget.y, -160, 160);
   controls.target.copy(smoothTarget);
+  camera.lookAt(smoothTarget);
   controls.update();
 
   renderer.render(scene, camera);
