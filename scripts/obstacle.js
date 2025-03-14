@@ -15,7 +15,7 @@ export function createObstacle(width, height, depth, x, y, z) {
 }
 
 export function updateObstacles(obstacles, player, scene, endGame) {
-  const obstacleSpeed = 0.8;
+  const obstacleSpeed = 2;
   const playerBox = new THREE.Box3().setFromObject(player.mesh);
 
   for (let i = 0; i < obstacles.length; i++) {

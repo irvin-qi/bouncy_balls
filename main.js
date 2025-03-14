@@ -4,6 +4,7 @@ import { createPlayer, updatePlayer } from "./scripts/player.js";
 import { setupInput } from "./scripts/input.js";
 import { createObstacle, updateObstacles } from "./scripts/obstacle.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { cameraPosition } from "three/src/nodes/TSL.js";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 let gameState = { active: false }; // need object to pass by reference
@@ -23,12 +24,14 @@ const scene = new THREE.Scene();
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
+let obstacles = [];
+
 initEnvironment(scene, renderer);
+generateStarterObstacles();
 const player = createPlayer(scene);
 const keysPressed = setupInput(player, gameState, () => {
   // gameStart function
   gameState.active = true;
-  generateStarterObstacles();
   player.velocityY = 0.9;
   camera.position.set(
     player.mesh.position.x,
@@ -39,7 +42,7 @@ const keysPressed = setupInput(player, gameState, () => {
   console.log("Game started!");
 });
 
-let obstacles = [];
+
 
 function endGame() {
   gameState.active = false;
@@ -47,6 +50,7 @@ function endGame() {
   obstacles.forEach((obstacle) => scene.remove(obstacle));
   obstacles = [];
   console.log("Game ended!");
+  generateStarterObstacles();
 }
 
 function generateStarterObstacles() {
@@ -54,7 +58,7 @@ function generateStarterObstacles() {
     // number of starter obstacles
     let xPos = Math.floor(Math.random() * 200) - 100;
     let yPos = Math.random() < 0.5 ? 30 : 120;
-    let zPos = player.mesh.position.z - (150 + i * 100); // spaced apart
+    let zPos = - (150 + i * 100); // spaced apart
     let obstacle = createObstacle(25, 60, 50, xPos, yPos, zPos);
     obstacles.push(obstacle);
     scene.add(obstacle);
