@@ -1,10 +1,12 @@
 import * as THREE from "three";
 import sky from "/assets/sky.avif";
+import { displayText } from "./text";
 
 export function initEnvironment(scene, renderer) {
+  displayText("BOUNCY BALL", "PRESS SPACE TO BEGIN", scene);
   const geometry = new THREE.PlaneGeometry(200, 5000);
   const skyTexture = new THREE.TextureLoader().load(sky);
-  skyTexture.offset.set(0, -0.1);
+  skyTexture.repeat.set(1, 0.9);
   const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
   const ground = new THREE.Mesh(geometry, material);
   const roof = new THREE.Mesh(geometry, material);

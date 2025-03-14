@@ -4,10 +4,14 @@ import { createPlayer, updatePlayer } from "./scripts/player.js";
 import { setupInput } from "./scripts/input.js";
 import { createObstacle, updateObstacles } from "./scripts/obstacle.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { cameraPosition } from "three/src/nodes/TSL.js";
+import { displayText, removeText } from "./scripts/text.js";
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-let gameState = { active: false }; // need object to pass by reference
+let gameState = { active: false };
+let gameLoopId; // Store the animation frame ID
+const lowerObstacleYPos = 20;
+const upperObstacleYPos = 130;
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -17,11 +21,10 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 75, 75); // Adjust this as needed
+camera.position.set(0, 75, 75);
 camera.lookAt(0, 0, 0);
 
 const scene = new THREE.Scene();
-
 const controls = new OrbitControls(camera, renderer.domElement);
 
 let obstacles = [];
@@ -30,7 +33,6 @@ initEnvironment(scene, renderer);
 generateStarterObstacles();
 const player = createPlayer(scene);
 const keysPressed = setupInput(player, gameState, () => {
-  // gameStart function
   gameState.active = true;
   player.velocityY = 0.9;
   camera.position.set(
@@ -40,26 +42,38 @@ const keysPressed = setupInput(player, gameState, () => {
   );
   camera.lookAt(player.mesh.position);
   console.log("Game started!");
+  removeText(scene);
 });
 
 
 
 function endGame() {
-  gameState.active = false;
+  gameState.active = false; // Stop game logic
+
   player.mesh.position.set(0, 75, 0);
   obstacles.forEach((obstacle) => scene.remove(obstacle));
   obstacles = [];
   console.log("Game ended!");
-  generateStarterObstacles();
+  cancelAnimationFrame(gameLoopId); // Stop rendering
+
+  // Display "GAME OVER" and pause for 5 seconds
+  displayText("GAME OVER", "PRESS SPACE TO RESTART", scene);
+
+  console.log("Resuming game...");
+  requestAnimationFrame(render);
 }
 
 function generateStarterObstacles() {
   for (let i = 0; i < 10; i++) {
-    // number of starter obstacles
+    const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+
     let xPos = Math.floor(Math.random() * 200) - 100;
-    let yPos = Math.random() < 0.5 ? 30 : 120;
-    let zPos = - (150 + i * 100); // spaced apart
-    let obstacle = createObstacle(25, 60, 50, xPos, yPos, zPos);
+    let yPos =
+      Math.random() < 0.5
+        ? lowerObstacleYPos + (obstacleHeight - 45) / 2
+        : upperObstacleYPos - (obstacleHeight - 45) / 2;
+    let zPos = player.mesh.position.z - (150 + i * 100);
+    let obstacle = createObstacle(25, obstacleHeight, 50, xPos, yPos, zPos);
     obstacles.push(obstacle);
     scene.add(obstacle);
   }
@@ -68,17 +82,24 @@ function generateStarterObstacles() {
 let lastObstacleTime = 0;
 
 function render(time) {
+  gameLoopId = requestAnimationFrame(render); // Store loop ID
   time *= 0.001;
+
   if (gameState.active) {
     if (time - lastObstacleTime >= 1.5) {
       lastObstacleTime = time;
+
       for (let i = 0; i < 4; i++) {
+        const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+
         let obstacle = createObstacle(
           25,
-          60,
+          obstacleHeight,
           50,
           Math.floor(Math.random() * 200) - 100,
-          Math.random() < 0.5 ? 30 : 120,
+          Math.random() < 0.5
+            ? lowerObstacleYPos + (obstacleHeight - 45) / 2
+            : upperObstacleYPos - (obstacleHeight - 45) / 2,
           player.mesh.position.z - 950
         );
         obstacles.push(obstacle);
@@ -97,7 +118,6 @@ function render(time) {
   controls.update();
 
   renderer.render(scene, camera);
-  requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
 
