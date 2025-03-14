@@ -40,22 +40,18 @@ export function displayText(line1, line2, scene) {
     const textMesh2 = new THREE.Mesh(geometry2, material2);
     textMesh2.position.set(-textWidth2 / 2, 73, 5); // Position the second line of text below the first line
 
-    // Enable shadows on both text meshes
     textMesh1.castShadow = true;
     textMesh1.receiveShadow = true;
     textMesh2.castShadow = true;
     textMesh2.receiveShadow = true;
 
-    // Add both text meshes to the scene
     scene.add(textMesh1);
     scene.add(textMesh2);
 
-    // Store the references of the text meshes for removal later
     textMeshes.push(textMesh1, textMesh2);
   });
 }
 
-// Function to remove the text from the scene
 export function removeText(scene) {
   textMeshes.forEach((mesh) => {
     scene.remove(mesh);

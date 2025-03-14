@@ -114,20 +114,14 @@ export function createObstacle(width, height, depth, x, y, z) {
   obstacleGroup.add(topOuterMesh);
   obstacleGroup.add(topInnerMesh);
 
-  // No disk needed: we want the pipe open so you can see inside.
-  // This also prevents that "lid" from blocking the view.
-
-  // Ensure each child mesh casts shadows.
   obstacleGroup.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
     }
   });
 
-  // Rotate based on the y position (as in your original).
   obstacleGroup.rotation.z = y > upperPos ? Math.PI : 0;
 
-  // Finally, position the entire group at (x, y, z).
   obstacleGroup.position.set(x, y, z);
   obstacleGroup.castShadow = true;
 

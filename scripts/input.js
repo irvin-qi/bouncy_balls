@@ -5,7 +5,6 @@ export function setupInput(player, gameState, start) {
     keysPressed[event.key.toLowerCase()] = true;
   });
 
-  // might not be best practice to handle jump here
   window.addEventListener("keyup", (event) => {
     keysPressed[event.key.toLowerCase()] = false;
     if (event.code === "Space") {

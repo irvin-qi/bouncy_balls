@@ -2,7 +2,6 @@
 import * as THREE from 'three';
 
 export function createCustomPhongMaterial(params) {
-  // Vertex shader: passes world position, normal, UV, and calculates shadow coordinates.
   const vertexShader = `
     varying vec3 vWorldPosition;
     varying vec3 vWorldNormal;
@@ -21,9 +20,6 @@ export function createCustomPhongMaterial(params) {
     }
   `;
 
-  // Fragment shader: computes ambient, diffuse, and specular lighting using the halfway vector,
-  // applies shadow mapping, and uses a texture if provided.
-  // We've modified the shadow factor so that in shadow the scene is only dimmed to 80% brightness.
   const fragmentShader = `
     uniform vec3 uLightPosition;
     uniform vec3 uViewPosition;
@@ -54,13 +50,11 @@ export function createCustomPhongMaterial(params) {
       vec3 specular = uSpecularColor * spec;
       vec3 phong = ambient + diffuse + specular;
       
-      // Shadow mapping: determine if the fragment is in shadow.
       float shadowFactor = 1.0;
       vec3 shadowCoord = vShadowCoord.xyz / vShadowCoord.w;
       shadowCoord = shadowCoord * 0.5 + 0.5;
       float closestDepth = texture2D(uShadowMap, shadowCoord.xy).r;
       if (shadowCoord.z > closestDepth + 0.005) {
-          // Instead of darkening by 50%, we now darken only by 20%.
           shadowFactor = 0.9;
       }
       phong *= shadowFactor;
@@ -74,7 +68,6 @@ export function createCustomPhongMaterial(params) {
     }
   `;
 
-  // Set up our uniforms.
   const uniforms = {
     uLightPosition: { value: new THREE.Vector3(0, 100, 100) },
     uViewPosition: { value: new THREE.Vector3(0, 75, 100) },
@@ -88,7 +81,6 @@ export function createCustomPhongMaterial(params) {
     uShadowMap: { value: new THREE.Texture() },
   };
 
-  // Ensure the texture uses mip-mapping if provided.
   if (params.texture) {
     params.texture.minFilter = THREE.LinearMipmapLinearFilter;
     params.texture.generateMipmaps = true;

@@ -44,7 +44,6 @@ let coinScore = 0;
 let lastScore = 0;
 const scoreDiv = document.getElementById("score");
 
-// Track the highest score of the session
 let highestScore = 0;
 
 function updateScore(newScore) {
@@ -76,7 +75,6 @@ const keysPressed = setupInput(player, gameState, () => {
 function endGame() {
   gameState.active = false; // Stop game logic
 
-  // Reset player position and remove active effects.
   player.mesh.position.set(0, 75, 0);
   if (player.isShielded) {
     scene.remove(player.shieldMesh);
@@ -87,7 +85,6 @@ function endGame() {
     player.isShrunk = false;
   }
 
-  // Remove obstacles, powerups, and coins.
   obstacles.forEach((obstacle) => scene.remove(obstacle));
   obstacles = [];
   powerUps.forEach((powerUp) => scene.remove(powerUp.mesh));
@@ -97,10 +94,8 @@ function endGame() {
   console.log("Game ended!");
   cancelAnimationFrame(gameLoopId); // Stop rendering
 
-  // Update the highest score for this session.
   if (score > highestScore) highestScore = score;
 
-  // Display scoreboard with final round score and highest score.
   displayText(
     "GAME OVER",
     "Score: " + score + " | High Score: " + highestScore,

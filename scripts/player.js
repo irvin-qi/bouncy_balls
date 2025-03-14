@@ -1,11 +1,9 @@
-// player.js
 import * as THREE from "three";
 import { createCustomPhongMaterial } from "../customShader.js";
 
 export function createPlayer(scene) {
   const geometry = new THREE.SphereGeometry(3, 32, 16);
   
-  // Use our custom shader material with a red color.
   const playerMaterial = createCustomPhongMaterial({
     ambientColor: new THREE.Color(0x222222),
     diffuseColor: new THREE.Color(0xff0000), // Red color.
