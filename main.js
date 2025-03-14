@@ -237,10 +237,10 @@ function render(time) {
     if (keysPressed["2"]) {
       powerUpEffects.slow(player)
     }
-    if (keysPressed["3"]) {
+    if (keysPressed["4"]) {
       powerUpEffects.shrink(player)
     }
-    if (keysPressed["4"]) {
+    if (keysPressed["3"]) {
       powerUpEffects.shield(player, scene)
     }
     if (keysPressed["5"]) {
