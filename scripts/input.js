@@ -13,7 +13,7 @@ export function setupInput(player, gameState, start) {
         start();
       }
       if (player.canJump) {
-        player.velocityY = 0.9;
+        player.velocityY = 0.75;
         player.canJump = false;
 
         setTimeout(() => {

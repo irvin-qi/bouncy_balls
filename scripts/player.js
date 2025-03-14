@@ -16,8 +16,9 @@ export function createPlayer(scene) {
     velocityY: 0,
     canJump: true,
     jumpCooldown: 80,
-    moveSpeed: 0.5,
-    gravity: -0.98,
+    moveSpeed: 0.3,
+    gravity: -0.8,
+    obstacleSpeed: 2,
   };
 }
 

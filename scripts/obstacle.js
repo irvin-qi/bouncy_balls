@@ -37,7 +37,8 @@ export function createObstacle(width, height, depth, x, y, z) {
     topRad,
     1,
     segments,
-    false
+    1,         
+    false     
   );
 
   const bottomTexture = new THREE.TextureLoader().load(bottomTube);
@@ -77,17 +78,23 @@ export function createObstacle(width, height, depth, x, y, z) {
   return obstacleGroup;
 }
 
-export function updateObstacles(obstacles, player, scene, endGame) {
-  const obstacleSpeed = 2;
+export function updateObstacles(obstacles, player, scene, endGame, speed) {
   const playerBox = new THREE.Box3().setFromObject(player.mesh);
 
   for (let i = 0; i < obstacles.length; i++) {
     let obstacle = obstacles[i];
-    obstacle.position.z += obstacleSpeed;
+    obstacle.position.z += speed;
     const obstacleBox = new THREE.Box3().setFromObject(obstacle);
     if (playerBox.intersectsBox(obstacleBox)) {
-      endGame();
-      return;
+      if (player.isShielded) {
+        scene.remove(player.shieldMesh);
+        player.isShielded = false;
+        scene.remove(obstacle);
+        obstacles.splice(i, 1);
+      } else{
+        endGame();
+        return;
+      }
     }
     if (obstacle.position.z > player.mesh.position.z + 20) {
       scene.remove(obstacle);
