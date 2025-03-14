@@ -1,4 +1,3 @@
-// main.js
 import * as THREE from "three";
 import { initEnvironment } from "./scripts/environment.js";
 import { createPlayer, updatePlayer } from "./scripts/player.js";

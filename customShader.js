@@ -1,4 +1,3 @@
-// customShader.js
 import * as THREE from 'three';
 
 export function createCustomPhongMaterial(params) {
