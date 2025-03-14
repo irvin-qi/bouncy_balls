@@ -230,6 +230,22 @@ function render(time) {
     updatePlayer(player, keysPressed, endGame);
     ground.position.z = player.mesh.position.z;
     roof.position.z = player.mesh.position.z;
+
+    if (keysPressed["1"]) {
+      powerUpEffects.bomb(player, scene, obstacles)
+    }
+    if (keysPressed["2"]) {
+      powerUpEffects.slow(player)
+    }
+    if (keysPressed["3"]) {
+      powerUpEffects.shrink(player)
+    }
+    if (keysPressed["4"]) {
+      powerUpEffects.shield(player, scene)
+    }
+    if (keysPressed["5"]) {
+      powerUpEffects.projectile(player, scene, obstacles)
+    }
   }
   smoothTarget.lerp(player.mesh.position, 0.02);
   smoothTarget.x = THREE.MathUtils.clamp(smoothTarget.x, -40, 40);
