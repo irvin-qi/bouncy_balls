@@ -131,14 +131,14 @@ function render(time) {
       lastScore = score;
       updateScore(score);
     }
-    if (time - lastObstacleTime >= 0.5) {
+    if (time - lastObstacleTime >= 1) {
       lastObstacleTime = time;
 
       const obstacleCount = Math.floor(Math.random() * 5) + 2;
 
       let availableLanes = lanes.slice();
 
-      for (let i = 0; i < obsatacleCount; i++) {
+      for (let i = 0; i < obstacleCount; i++) {
         const laneIndex = Math.floor(Math.random() * availableLanes.length);
         const laneX = availableLanes.splice(laneIndex, 1)[0];
 
