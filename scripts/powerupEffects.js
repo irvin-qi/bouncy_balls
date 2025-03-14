@@ -79,25 +79,51 @@ export const powerUpEffects = {
     updateProjectiles();
   },
   shrink: (player) => {
+    // Don’t apply if already shrunk
     if (player.isShrunk) return;
     player.isShrunk = true;
+  
+    // Target scale for “small”
     const targetScale = new THREE.Vector3(0.2, 0.2, 0.2);
+    // Normal (original) scale
     const normalScale = new THREE.Vector3(1, 1, 1);
+  
+    // How long the shrink/grow animation takes (in ms)
     const duration = 800;
     let startTime = performance.now();
+  
     function lerpScale(currentTime) {
       let elapsedTime = currentTime - startTime;
       let t = Math.min(elapsedTime / duration, 1);
+  
+      // Shrink the player's mesh
       player.mesh.scale.lerpVectors(normalScale, targetScale, t);
+  
+      // If shield is active, shrink the shield mesh, too
+      if (player.shieldMesh) {
+        player.shieldMesh.scale.lerpVectors(normalScale, targetScale, t);
+      }
+  
+      // Continue animating until fully shrunk
       if (t < 1) {
         requestAnimationFrame(lerpScale);
       } else {
+        // Remain shrunk for 8 seconds, then grow back
         setTimeout(() => {
           startTime = performance.now();
+  
           function lerpBackScale(currentTime) {
             let elapsedTime = currentTime - startTime;
             let t = Math.min(elapsedTime / duration, 1);
+  
+            // Grow the player's mesh back
             player.mesh.scale.lerpVectors(targetScale, normalScale, t);
+  
+            // If shield is active, grow the shield mesh back
+            if (player.shieldMesh) {
+              player.shieldMesh.scale.lerpVectors(targetScale, normalScale, t);
+            }
+  
             if (t < 1) {
               requestAnimationFrame(lerpBackScale);
             } else {
@@ -109,7 +135,7 @@ export const powerUpEffects = {
       }
     }
     requestAnimationFrame(lerpScale);
-  },
+  },  
   slow: (player) => {
     if (player.isSlowed) return;
     player.isSlowed = true;

@@ -44,6 +44,9 @@ let coinScore = 0;
 let lastScore = 0;
 const scoreDiv = document.getElementById("score");
 
+// Track the highest score of the session
+let highestScore = 0;
+
 function updateScore(newScore) {
   score = newScore;
   scoreDiv.innerText = "Score: " + score;
@@ -71,7 +74,9 @@ const keysPressed = setupInput(player, gameState, () => {
 });
 
 function endGame() {
-  gameState.active = false;
+  gameState.active = false; // Stop game logic
+
+  // Reset player position and remove active effects.
   player.mesh.position.set(0, 75, 0);
   if (player.isShielded) {
     scene.remove(player.shieldMesh);
@@ -81,6 +86,8 @@ function endGame() {
     player.mesh.scale.set(1, 1, 1);
     player.isShrunk = false;
   }
+
+  // Remove obstacles, powerups, and coins.
   obstacles.forEach((obstacle) => scene.remove(obstacle));
   obstacles = [];
   powerUps.forEach((powerUp) => scene.remove(powerUp.mesh));
@@ -88,8 +95,18 @@ function endGame() {
   coins.forEach((coin) => scene.remove(coin));
   coins = [];
   console.log("Game ended!");
-  cancelAnimationFrame(gameLoopId);
-  displayText("GAME OVER", "PRESS SPACE TO RESTART", scene);
+  cancelAnimationFrame(gameLoopId); // Stop rendering
+
+  // Update the highest score for this session.
+  if (score > highestScore) highestScore = score;
+
+  // Display scoreboard with final round score and highest score.
+  displayText(
+    "GAME OVER",
+    "Score: " + score + " | High Score: " + highestScore,
+    scene
+  );
+
   generateStarterObstacles();
   console.log("Resuming game...");
   requestAnimationFrame(render);
@@ -117,9 +134,8 @@ let lastCoinTime = 0;
 let startTime = 0;
 const smoothTarget = new THREE.Vector3().copy(player.mesh.position);
 
-// Function to traverse the scene and update uniforms for every custom shader material.
 function updateCustomShaderUniforms() {
-  scene.traverse(function(object) {
+  scene.traverse(function (object) {
     if (object.material && object.material instanceof THREE.ShaderMaterial) {
       object.material.uniforms.uViewPosition.value.copy(camera.position);
       object.material.uniforms.uLightPosition.value.copy(sunLight.position);
@@ -129,7 +145,6 @@ function updateCustomShaderUniforms() {
         sunLight.shadow.camera.matrixWorldInverse
       );
       object.material.uniforms.lightMatrix.value.copy(lightMatrix);
-      // Check if the shadow map is available before updating the uniform.
       if (sunLight.shadow.map && sunLight.shadow.map.texture) {
         object.material.uniforms.uShadowMap.value = sunLight.shadow.map.texture;
       }
@@ -143,10 +158,10 @@ function render(time) {
   if (gameState.active) {
     const elapsed = time - startTime;
     let timeScore = Math.floor(elapsed * 10);
-    let score = timeScore + coinScore;
-    if (score !== lastScore) {
-      lastScore = score;
-      updateScore(score);
+    let currentScore = timeScore + coinScore;
+    if (currentScore !== lastScore) {
+      lastScore = currentScore;
+      updateScore(currentScore);
     }
     if (time - lastObstacleTime >= 1) {
       lastObstacleTime = time;
@@ -155,7 +170,8 @@ function render(time) {
       for (let i = 0; i < obstacleCount; i++) {
         const laneIndex = Math.floor(Math.random() * availableLanes.length);
         const laneX = availableLanes.splice(laneIndex, 1)[0];
-        const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+        const obstacleHeight =
+          Math.floor(Math.random() * (60 - 30 + 1)) + 30;
         let obstacleY;
         if (Math.random() < 0.5) {
           obstacleY = lowerObstacleYPos + (obstacleHeight - 45) / 2;
@@ -228,7 +244,6 @@ function render(time) {
   camera.lookAt(smoothTarget);
   controls.update();
 
-  // Update the uniforms for all custom shader materials.
   updateCustomShaderUniforms();
 
   renderer.render(scene, camera);

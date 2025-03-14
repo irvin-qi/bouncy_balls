@@ -22,7 +22,7 @@ export function createCoin(x, y, z) {
   coinFaceTexture.center.set(0.5, 0.5);
 
   //    (B) Rotate the texture by -90 degrees (flipping it in the correct direction).
-  coinFaceTexture.rotation = -Math.PI / 2;
+  // coinFaceTexture.rotation = -Math.PI / 2;
 
   //    (C) Zoom in by increasing the repeat values.
   coinFaceTexture.repeat.set(1.5, 1.5);

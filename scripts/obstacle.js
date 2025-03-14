@@ -7,9 +7,6 @@ export function createObstacle(width, height, depth, x, y, z) {
   const segments = 100; // Higher segments for smoothness
   const upperPos = 100;
 
-  // ------------------------------
-  // 1) BOTTOM TUBE (outer only)
-  // ------------------------------
   const bottomRad = 12;
   const bottomHeight = height;
 
@@ -42,9 +39,6 @@ export function createObstacle(width, height, depth, x, y, z) {
   const bottomObj = new THREE.Mesh(bottomGeom, bottomMat);
   bottomObj.castShadow = true;
 
-  // ------------------------------
-  // 2) TOP TUBE (outer + inner)
-  // ------------------------------
   const topRad = 15;      // Outer radius (slightly bigger than bottom)
   const topHeight = 15;   // Height of the top lip
 
@@ -115,9 +109,6 @@ export function createObstacle(width, height, depth, x, y, z) {
   topOuterMesh.position.set(0, bottomHeight / 2, 0);
   topInnerMesh.position.set(0, bottomHeight / 2, 0);
 
-  // ------------------------------
-  // 3) Combine into a group
-  // ------------------------------
   const obstacleGroup = new THREE.Group();
   obstacleGroup.add(bottomObj);
   obstacleGroup.add(topOuterMesh);
@@ -143,9 +134,7 @@ export function createObstacle(width, height, depth, x, y, z) {
   return obstacleGroup;
 }
 
-// ---------------------------------------------------------
-// 4) Updating obstacles (unchanged from your original code)
-// ---------------------------------------------------------
+
 export function updateObstacles(obstacles, player, scene, endGame, speed) {
   const playerBox = new THREE.Box3().setFromObject(player.mesh);
   for (let i = 0; i < obstacles.length; i++) {
