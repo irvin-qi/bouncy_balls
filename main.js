@@ -28,11 +28,12 @@ camera.lookAt(0, 0, 0);
 
 const scene = new THREE.Scene();
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.minDistance = 50; 
-controls.maxDistance = 150; 
+controls.minDistance = 50;
+controls.maxDistance = 150;
 
 let obstacles = [];
 let powerUps = [];
+const lanes = [-80, -40, 0, 40, 80];
 
 initEnvironment(scene, renderer);
 const player = createPlayer(scene);
@@ -59,8 +60,8 @@ function endGame() {
     player.isShielded = false;
   }
   console.log(player.isShrunk);
-  if (player.isShrunk){
-    player.mesh.scale.set(1,1,1);
+  if (player.isShrunk) {
+    player.mesh.scale.set(1, 1, 1);
     player.isShrunk = false;
   }
   obstacles.forEach((obstacle) => scene.remove(obstacle));
@@ -79,13 +80,15 @@ function endGame() {
 function generateStarterObstacles() {
   for (let i = 0; i < 10; i++) {
     const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+    const laneIndex = Math.floor(Math.random() * lanes.length);
+    const xPos = lanes[laneIndex];
 
-    let xPos = Math.floor(Math.random() * 200) - 100;
-    let yPos =
+    const yPos =
       Math.random() < 0.5
         ? lowerObstacleYPos + (obstacleHeight - 45) / 2
         : upperObstacleYPos - (obstacleHeight - 45) / 2;
-    let zPos = -(150 + i * 100);
+    const zPos = -(150 + i * 100);
+
     let obstacle = createObstacle(25, obstacleHeight, 50, xPos, yPos, zPos);
     obstacles.push(obstacle);
     scene.add(obstacle);
@@ -100,21 +103,33 @@ function render(time) {
   time *= 0.001;
 
   if (gameState.active) {
-    if (time - lastObstacleTime >= 1.5) {
+    if (time - lastObstacleTime >= 0.5) {
       lastObstacleTime = time;
 
-      for (let i = 0; i < 4; i++) {
+      const obstacleCount = Math.floor(Math.random() * 8) + 4;
+
+      let availableLanes = lanes.slice();
+
+      for (let i = 0; i < obstacleCount; i++) {
+        const laneIndex = Math.floor(Math.random() * availableLanes.length);
+        const laneX = availableLanes.splice(laneIndex, 1)[0];
+
         const obstacleHeight = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
+        let obstacleY;
+        if (Math.random() < 0.5) {
+          obstacleY = lowerObstacleYPos + (obstacleHeight - 45) / 2;
+        } else {
+          obstacleY = upperObstacleYPos - (obstacleHeight - 45) / 2;
+        }
+        const obstacleZ = player.mesh.position.z - 950;
 
         let obstacle = createObstacle(
           25,
           obstacleHeight,
           50,
-          Math.floor(Math.random() * 200) - 100,
-          Math.random() < 0.5
-            ? lowerObstacleYPos + (obstacleHeight - 45) / 2
-            : upperObstacleYPos - (obstacleHeight - 45) / 2,
-          player.mesh.position.z - 950
+          laneX,
+          obstacleY,
+          obstacleZ
         );
         obstacles.push(obstacle);
         scene.add(obstacle);
@@ -130,7 +145,7 @@ function render(time) {
         Math.floor(Math.random() * 200) - 100,
         Math.random() < 0.5 ? lowerObstacleYPos + 10 : upperObstacleYPos - 10,
         player.mesh.position.z - 950,
-        ()=>powerUpEffects[powerUpType](player, scene, obstacles)
+        () => powerUpEffects[powerUpType](player, scene, obstacles)
       );
       powerUps.push(powerUp);
       console.log("Powerup created!");
@@ -143,7 +158,7 @@ function render(time) {
   smoothTarget.lerp(player.mesh.position, 0.02);
   smoothTarget.x = THREE.MathUtils.clamp(smoothTarget.x, -40, 40);
   smoothTarget.y = THREE.MathUtils.clamp(smoothTarget.y, -160, 160);
-  controls.target.copy(smoothTarget)
+  controls.target.copy(smoothTarget);
   controls.update();
 
   renderer.render(scene, camera);
