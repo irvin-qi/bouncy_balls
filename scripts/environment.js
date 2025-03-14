@@ -1,15 +1,25 @@
 import * as THREE from "three";
 import sky from "/assets/sky.avif";
+import grass from "/assets/grass.png";
 import { displayText } from "./text";
 
 export function initEnvironment(scene, renderer) {
   displayText("BOUNCY BALL", "PRESS SPACE TO BEGIN", scene);
   const geometry = new THREE.PlaneGeometry(200, 5000);
+
   const skyTexture = new THREE.TextureLoader().load(sky);
+  const grassTexture = new THREE.TextureLoader().load(grass);
+  grassTexture.wrapS = THREE.RepeatWrapping;
+  grassTexture.wrapT = THREE.RepeatWrapping;
+  grassTexture.repeat.set(200, 200);
   skyTexture.repeat.set(1, 0.9);
-  const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-  const ground = new THREE.Mesh(geometry, material);
-  const roof = new THREE.Mesh(geometry, material);
+
+  const roofMaterial = new THREE.MeshPhongMaterial({ color: 0x3f9b0b });
+  const grassMaterial = new THREE.MeshPhongMaterial({
+    map: grassTexture,
+  });
+  const ground = new THREE.Mesh(geometry, grassMaterial);
+  const roof = new THREE.Mesh(geometry, roofMaterial);
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
 
@@ -40,4 +50,6 @@ export function initEnvironment(scene, renderer) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   scene.background = skyTexture;
+
+  return { ground, roof };
 }

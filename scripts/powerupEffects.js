@@ -131,10 +131,12 @@ export const powerUpEffects = {
     if (player.isSlowed) return;
     player.isSlowed = true;
     player.obstacleSpeed = player.obstacleSpeed / 2;
+    player.gravity = player.gravity / 2;
 
     setTimeout(() => {
       player.isSlowed = false;
       player.obstacleSpeed = player.obstacleSpeed * 2;
+        player.gravity = player.gravity * 2;
     }, 5000);
   },
   bomb: (player, scene, obstacles) => {

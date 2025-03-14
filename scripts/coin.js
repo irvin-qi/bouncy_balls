@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 export function createCoin(x, y, z) {
-  const coinGeometry = new THREE.CylinderGeometry(8, 8, 2, 16);
+  const coinGeometry = new THREE.CylinderGeometry(9, 9, 2, 16);
   const coinMaterial = new THREE.MeshPhongMaterial({ color: 0xffff00 });
   const coin = new THREE.Mesh(coinGeometry, coinMaterial);
   coin.rotation.x = Math.PI / 2;

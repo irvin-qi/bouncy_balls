@@ -48,7 +48,7 @@ function updateScore(newScore) {
   scoreDiv.innerText = "Score: " + score;
 }
 
-initEnvironment(scene, renderer);
+let bounds = initEnvironment(scene, renderer);
 const player = createPlayer(scene);
 generateStarterObstacles();
 const keysPressed = setupInput(player, gameState, () => {
@@ -138,7 +138,7 @@ function render(time) {
 
       let availableLanes = lanes.slice();
 
-      for (let i = 0; i < obstacleCount; i++) {
+      for (let i = 0; i < obsatacleCount; i++) {
         const laneIndex = Math.floor(Math.random() * availableLanes.length);
         const laneX = availableLanes.splice(laneIndex, 1)[0];
 
@@ -172,7 +172,7 @@ function render(time) {
         console.log(powerUpType);
         const powerUp = createPowerUp(
           Math.floor(Math.random() * 200) - 100,
-          Math.floor(Math.random() * 150) + 10,
+          Math.floor(Math.random() * 120) + 20,
           player.mesh.position.z - 950,
           () => powerUpEffects[powerUpType](player, scene, obstacles)
         );
@@ -208,6 +208,8 @@ function render(time) {
       player.obstacleSpeed
     );
     updatePlayer(player, keysPressed, endGame);
+    bounds.ground.position.z = player.mesh.position.z;
+    bounds.roof.position.z = player.mesh.position.z;
   }
   smoothTarget.lerp(player.mesh.position, 0.02);
   smoothTarget.x = THREE.MathUtils.clamp(smoothTarget.x, -40, 40);
